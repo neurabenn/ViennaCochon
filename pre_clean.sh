@@ -150,25 +150,25 @@ fslmaths ${func_data} -Tmean mean_func
 echo susan ${func_data} ${thr_sus} ${sig}  3 1 1 mean_func ${thr_sus} ${func_data/.nii.gz/smooth}
 susan ${func_data} ${thr_sus} ${sig}  3 1 1 mean_func ${thr_sus} ${func_data/.nii.gz/smooth}
 
-# # rm *usan_size.nii.gz
+rm *usan*.nii.gz
 
-# mean=`$FSLDIR/bin/fslstats  ${func_data/.nii.gz/smooth} -k ${mask} -m`
+mean=`$FSLDIR/bin/fslstats  ${func_data/.nii.gz/smooth} -k ${mask} -m`
 
-# scale=`echo "10000/${mean}"|bc -l`
-# echo ${scale}
-# echo $FSLDIR/bin/fslmaths -mul ${scale}  ${func_data/.nii.gz/scaled}
-
-
-# fslmaths ${func_data/.nii.gz/smooth} -mul ${scale}  ${func_data/.nii.gz/scaled}
+scale=`echo "10000/${mean}"|bc -l`
+echo ${scale}
+echo $FSLDIR/bin/fslmaths -mul ${scale}  ${func_data/.nii.gz/scaled}
 
 
+fslmaths ${func_data/.nii.gz/smooth} -mul ${scale}  ${func_data/.nii.gz/scaled}
 
-# # # ##### implement band pass filter
-# # # #### should be done for a 3 second TR 
 
-# fslmaths ${func_data/.nii.gz/scaled} -bptf 16.66666667 -1 filtered_func_data ##### bandpass filtered to 100 seconds. its FWHM so TR of 2, 50 seconds means 25 as half max.
 
-# melodic -i filtered_func_data.nii.gz -o ./filtered_func_data.ica -m ${mask} --report --nobet --Oall
+# # ##### implement band pass filter
+# # #### should be done for a 3 second TR 
+
+fslmaths ${func_data/.nii.gz/scaled} -bptf 16.66666667 -1 filtered_func_data ##### bandpass filtered to 100 seconds. its FWHM so TR of 2, 50 seconds means 25 as half max.
+
+melodic -i filtered_func_data.nii.gz -o ./filtered_func_data.ica -m ${mask} --report --nobet --Oall
 
 
 
