@@ -28,47 +28,48 @@ fslmaths ${mask} ${out}/brain_mask.nii.gz
 fslmaths ${std} ${out}/std.nii.gz
 fslmaths ${std_mask} ${out}/ref_mask.nii.gz
 
-# cd ${out}
+cd ${out}
 
-# mkdir -p reg
+mkdir -p reg
 
-# echo "###### registraton to PNI50 ######"
+echo "###### registraton to PNI50 ######"
 
-# fslmaths highres -mas brain_mask highres_brain
+fslmaths highres -mas brain_mask highres_brain
 
-# DenoiseImage -d 3 -i highres_brain.nii.gz -o highres_brain.nii.gz
+DenoiseImage -d 3 -i highres_brain.nii.gz -o highres_brain.nii.gz
 
-# flirt -in highres_brain -ref std -searchrx -180 180 -searchry -180 180 -searchrz -180 180 -out highres2stdLin.nii.gz -dof 12 -omat highres2std.mat 
+flirt -in highres_brain -ref std -searchrx -180 180 -searchry -180 180 -searchrz -180 180 -out highres2stdLin.nii.gz -dof 12 -omat highres2std.mat 
 
-# echo "running fnirt"
-# fnirt --in=highres_brain.nii.gz --ref=std.nii.gz --aff=highres2std.mat --inmask=brain_mask.nii.gz --refmask=ref_mask.nii.gz --cout=highres2std_warp
+echo "running fnirt"
+fnirt --in=highres_brain.nii.gz --ref=std.nii.gz --aff=highres2std.mat --inmask=brain_mask.nii.gz --refmask=ref_mask.nii.gz --cout=highres2std_warp
 
-# echo "registration done"
-
-
-# #### create example func image 
-# echo "example func volume is "
-# vols=$(fslnvols prefiltered_func_data.nii.gz)
-# mid=`echo $vols/2|bc`
-# echo $mid
-
-# fslroi prefiltered_func_data.nii.gz example_func_data.nii.gz ${mid} 1
+applywarp --in=highres_brain.nii.gz --ref=std.nii.gz --premat=highres2std.mat --warp=highres2std_warp --out=highres2stdWarped.nii.gz
+echo "registration done"
 
 
-# #### initial betting 
+#### create example func image 
+echo "example func volume is "
+vols=$(fslnvols prefiltered_func_data.nii.gz)
+mid=`echo $vols/2|bc`
+echo $mid
 
-# bet example_func_data.nii.gz example_func_data_initBET.nii.gz -m  -f 0.9 -c 38 28 10 
+fslroi prefiltered_func_data.nii.gz example_func_data.nii.gz ${mid} 1
 
-# #### initialize func brain extraction with registration 
-# flirt -in example_func_data.nii.gz -ref highres.nii.gz -dof 6 -inweight example_func_data_initBET_mask.nii.gz  -refweight brain_mask -searchrx -180 180 -searchry -180 180 -searchrz -180 180 -out example_func2highresInit -omat example_func2highresInit.mat
 
-# convert_xfm  -omat highres_2examplefuncInit.mat -inverse example_func2highresInit.mat
+#### initial betting 
 
-# applywarp  -i brain_mask.nii.gz -r example_func_data.nii.gz -o func_maskInit.nii.gz --premat=highres_2examplefuncInit.mat
+bet example_func_data.nii.gz example_func_data_initBET.nii.gz -m  -f 0.9 -c 38 28 10 
 
-# fslmaths func_maskInit.nii.gz -dilM -dilM -bin func_maskInit.nii.gz
+#### initialize func brain extraction with registration 
+flirt -in example_func_data.nii.gz -ref highres.nii.gz -dof 6 -inweight example_func_data_initBET_mask.nii.gz  -refweight brain_mask  -out example_func2highresInit -omat example_func2highresInit.mat
 
-# fslmaths example_func_data.nii.gz -mas func_maskInit.nii.gz example_func_brain.nii.gz
+convert_xfm  -omat highres_2examplefuncInit.mat -inverse example_func2highresInit.mat
+
+applywarp  -i brain_mask.nii.gz -r example_func_data.nii.gz -o func_maskInit.nii.gz --premat=highres_2examplefuncInit.mat
+
+fslmaths func_maskInit.nii.gz -dilM -dilM -bin func_maskInit.nii.gz
+
+fslmaths example_func_data.nii.gz -mas func_maskInit.nii.gz example_func_brain.nii.gz
 
 # ##### second extraction 
 
