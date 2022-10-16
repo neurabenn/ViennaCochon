@@ -90,65 +90,65 @@ convertwarp --premat=example_func2highres.mat --ref=$std --warp1=highres2std_war
 
 
 
-# rm *Init*
+rm *Init*
 
-# mv *mat reg
-# mv *warp* reg
-# ##### run fast to do white matter segmentation 
+mv *mat reg
+mv *warp* reg
+##### run fast to do white matter segmentation 
 
-# mkdir -p seg
+mkdir -p seg
 
-# fast -o seg/seg highres_brain.nii.gz
+fast -o seg/seg highres_brain.nii.gz
 
-# fslmaths seg/seg_pve_2.nii.gz -thr 0.5 -bin wm.nii.gz
-
-
-# ####### TIME FOR TIME SERIES ######## 
+fslmaths seg/seg_pve_2.nii.gz -thr 0.5 -bin wm.nii.gz
 
 
-# ### let's do motion correction to the example func image 
-
-# mcflirt -in prefiltered_func_data -out prefiltered_func_data_mcf -mats -plots -reffile example_func_data.nii.gz -rmsrel -rmsabs -spline_final
-
-# /bin/mkdir -p mc ; /bin/mv -f prefiltered_func_data_mcf.mat prefiltered_func_data_mcf.par prefiltered_func_data_mcf_abs.rms prefiltered_func_data_mcf_abs_mean.rms prefiltered_func_data_mcf_rel.rms prefiltered_func_data_mcf_rel_mean.rms mc
-# cd mc
-# fsl_tsplot -i prefiltered_func_data_mcf.par -t 'MCFLIRT estimated rotations (radians)' -u 1 --start=1 --finish=3 -a x,y,z -w 640 -h 144 -o rot.png 
-
-# fsl_tsplot -i prefiltered_func_data_mcf.par -t 'MCFLIRT estimated translations (mm)' -u 1 --start=4 --finish=6 -a x,y,z -w 640 -h 144 -o trans.png 
-
-# fsl_tsplot -i prefiltered_func_data_mcf_abs.rms,prefiltered_func_data_mcf_rel.rms -t 'MCFLIRT estimated mean displacement (mm)' -u 1 -w 640 -h 144 -a absolute,relative -o disp.png 
-# cd ../
-
-# pwd
-
-# #### extract brain so make sure we only include brain voxels in smoothing 
-
-# # fslmaths prefiltered_func_data_mcf.nii.gz -mas example_funcbrainmask.nii.gz prefiltered_func_data_thr
+####### TIME FOR TIME SERIES ######## 
 
 
+### let's do motion correction to the example func image 
 
-# #### do smoothing and susan 
+mcflirt -in prefiltered_func_data -out prefiltered_func_data_mcf -mats -plots -reffile example_func_data.nii.gz -rmsrel -rmsabs -spline_final
 
-# kernel=6
-# mask=example_funcbrainmask.nii.gz 
+/bin/mkdir -p mc ; /bin/mv -f prefiltered_func_data_mcf.mat prefiltered_func_data_mcf.par prefiltered_func_data_mcf_abs.rms prefiltered_func_data_mcf_abs_mean.rms prefiltered_func_data_mcf_rel.rms prefiltered_func_data_mcf_rel_mean.rms mc
+cd mc
+fsl_tsplot -i prefiltered_func_data_mcf.par -t 'MCFLIRT estimated rotations (radians)' -u 1 --start=1 --finish=3 -a x,y,z -w 640 -h 144 -o rot.png 
 
-# func_data=prefiltered_func_data_mcf.nii.gz
-# echo $FSLDIR/bin/fslstats  ${func_data} -k ${mask} -p 50
-# med=`$FSLDIR/bin/fslstats ${func_data} -k ${mask}  -p 50`
-# thr_sus=$(echo "${med} * 0.75" |bc -l) ####### for info on this look here: https://www.jiscmail.ac.uk/cgi-bin/webadmin?A2=fsl;a0fe9d7c.1209
+fsl_tsplot -i prefiltered_func_data_mcf.par -t 'MCFLIRT estimated translations (mm)' -u 1 --start=4 --finish=6 -a x,y,z -w 640 -h 144 -o trans.png 
 
-# echo "intensity for susan is " ${thr_sus}
-# echo "gaussian kernel selected is" ${kernel}
+fsl_tsplot -i prefiltered_func_data_mcf_abs.rms,prefiltered_func_data_mcf_rel.rms -t 'MCFLIRT estimated mean displacement (mm)' -u 1 -w 640 -h 144 -a absolute,relative -o disp.png 
+cd ../
 
-# sig=$(echo "${kernel}/(sqrt(8 * l(2)))" | bc -l)
+pwd
 
-# echo ${sig}
-# echo "running susan using a gausian kernel of" ${kernel} "mm"
+#### extract brain so make sure we only include brain voxels in smoothing 
 
-# fslmaths ${func_data} -Tmean mean_func
+# fslmaths prefiltered_func_data_mcf.nii.gz -mas example_funcbrainmask.nii.gz prefiltered_func_data_thr
 
-# echo susan ${func_data} ${thr_sus} ${sig}  3 1 1 mean_func ${thr_sus} ${func_data/.nii.gz/smooth}
-# susan ${func_data} ${thr_sus} ${sig}  3 1 1 mean_func ${thr_sus} ${func_data/.nii.gz/smooth}
+
+
+#### do smoothing and susan 
+
+kernel=6
+mask=example_funcbrainmask.nii.gz 
+
+func_data=prefiltered_func_data_mcf.nii.gz
+echo $FSLDIR/bin/fslstats  ${func_data} -k ${mask} -p 50
+med=`$FSLDIR/bin/fslstats ${func_data} -k ${mask}  -p 50`
+thr_sus=$(echo "${med} * 0.75" |bc -l) ####### for info on this look here: https://www.jiscmail.ac.uk/cgi-bin/webadmin?A2=fsl;a0fe9d7c.1209
+
+echo "intensity for susan is " ${thr_sus}
+echo "gaussian kernel selected is" ${kernel}
+
+sig=$(echo "${kernel}/(sqrt(8 * l(2)))" | bc -l)
+
+echo ${sig}
+echo "running susan using a gausian kernel of" ${kernel} "mm"
+
+fslmaths ${func_data} -Tmean mean_func
+
+echo susan ${func_data} ${thr_sus} ${sig}  3 1 1 mean_func ${thr_sus} ${func_data/.nii.gz/smooth}
+susan ${func_data} ${thr_sus} ${sig}  3 1 1 mean_func ${thr_sus} ${func_data/.nii.gz/smooth}
 
 # # rm *usan_size.nii.gz
 
