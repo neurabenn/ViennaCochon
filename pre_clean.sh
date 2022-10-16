@@ -172,4 +172,7 @@ fslmaths ${func_data/.nii.gz/scaled} -bptf 16.66666667 -1 -add tempMean filtered
 melodic -i filtered_func_data.nii.gz -o ./filtered_func_data.ica -m ${mask} --report --nobet --Oall
 
 
+rm *pre_filtered_func*
+
+
 
