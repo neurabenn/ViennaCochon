@@ -32,7 +32,7 @@ cd ${out}
 
 mkdir -p reg
 
-###### registraton to PNI50 ######
+echo "###### registraton to PNI50 ######"
 
 fslmaths highres -mas brain_mask highres_brain
 
@@ -40,9 +40,10 @@ DenoiseImage -d 3 -i highres_brain.nii.gz -o highres_brain.nii.gz
 
 flirt -in highres_brain -ref std -searchrx -180 180 -searchry -180 180 -searchrz -180 180 -out highres2stdLin.nii.gz -dof 12 -omat highres2std.mat 
 
+echo "running fnirt"
 fnirt --in=highres_brain.nii.gz --ref=std.nii.gz --aff=highres2std.mat --inmask=brain_mask.nii.gz --refmask=ref_mask.nii.gz --cout=highres2std_warp
 
-
+echo "registration done"
 
 
 #### create example func image 
