@@ -1,7 +1,8 @@
 #!/bin/bash
-
+module load Boost/1.67.0-foss-2018b
 module load FSL/5.0.11-foss-2018b-Python-3.6.6
 module load ANTs/2.3.1-foss-2018b-Python-3.6.6
+
 
 
 source ${FSLDIR}/etc/fslconf/fsl.sh
