@@ -43,7 +43,7 @@ flirt -in highres_brain -ref std -searchrx -180 180 -searchry -180 180 -searchrz
 echo "running fnirt"
 fnirt --in=highres_brain.nii.gz --ref=std.nii.gz --aff=highres2std.mat --inmask=brain_mask.nii.gz --refmask=ref_mask.nii.gz --cout=highres2std_warp
 
-applywarp --in=highres_brain.nii.gz --ref=std.nii.gz --premat=highres2std.mat --warp=highres2std_warp --out=highres2stdWarped.nii.gz
+applywarp --in=highres_brain.nii.gz --ref=std.nii.gz  --warp=highres2std_warp --out=highres2stdWarped.nii.gz
 echo "registration done"
 
 
@@ -61,8 +61,7 @@ fslroi prefiltered_func_data.nii.gz example_func_data.nii.gz ${mid} 1
 bet example_func_data.nii.gz example_func_data_initBET.nii.gz -m  -f 0.9 -c 38 28 10 
 
 #### initialize func brain extraction with registration 
-flirt -in example_func_data.nii.gz -ref highres.nii.gz -dof 6 -inweight example_func_data_initBET_mask.nii.gz  -refweight brain_mask  -out example_func2highresInit -omat example_func2highresInit.mat
-
+flirt -in example_func_data_initBET.nii.gz -ref highres_brain.nii.gz -dof 7  -out example_func2highresInit  -omat example_func2highresInit.mat -usesqform
 convert_xfm  -omat highres_2examplefuncInit.mat -inverse example_func2highresInit.mat
 
 applywarp  -i brain_mask.nii.gz -r example_func_data.nii.gz -o func_maskInit.nii.gz --premat=highres_2examplefuncInit.mat
