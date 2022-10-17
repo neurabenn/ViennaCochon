@@ -176,10 +176,10 @@ rm *pre_filtered_func*
 
 convertwarp --premat=reg/example_func2highres.mat --warp1=reg/highres2std_warp.nii.gz --ref=std.nii.gz --out=reg/example_func2stdWarp.nii.gz
 
-applywarp --in=example_func_brain.nii.gz --ref=std.nii.gz --warp=reg/example_func2stdWarp.nii.gz --out=example_func2std.nii.gz
+applywarp --in=example_func_brain.nii.gz --ref=/well/margulies/users/mnk884/PigaDataViennaComplete/PNI50_2.5mm.nii.gz --warp=reg/example_func2stdWarp.nii.gz --out=example_func2std.nii.gz
 
 fslmaths filtered_func_data.nii.gz -mas example_funcbrainmask.nii.gz filtered_func_data_brain
 
-applywarp --in=filtered_func_data_brain.nii.gz --ref=std.nii.gz --warp=reg/example_func2stdWarp.nii.gz --out=filtered_func_data_2std_dirty.nii.gz
+applywarp --in=filtered_func_data_brain.nii.gz --ref=/well/margulies/users/mnk884/PigaDataViennaComplete/PNI50_2.5mm.nii.gz --warp=reg/example_func2stdWarp.nii.gz --out=filtered_func_data_2std_dirty.nii.gz
 
 
