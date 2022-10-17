@@ -27,6 +27,7 @@ fslmaths ${func} ${out}/prefiltered_func_data.nii.gz
 fslmaths ${mask} ${out}/brain_mask.nii.gz
 fslmaths ${std} ${out}/std.nii.gz
 fslmaths ${std_mask} ${out}/ref_mask.nii.gz
+fslmaths /well/margulies/users/mnk884/PigaDataViennaComplete/PNI50_2.5mm.nii.gz  ${out}/std_2.5mm.nii.gz
 
 cd ${out}
 
@@ -176,7 +177,7 @@ rm *pre_filtered_func*
 
 convertwarp --premat=reg/example_func2highres.mat --warp1=reg/highres2std_warp.nii.gz --ref=std.nii.gz --out=reg/example_func2stdWarp.nii.gz
 
-applywarp --in=example_func_brain.nii.gz --ref=/well/margulies/users/mnk884/PigaDataViennaComplete/PNI50_2.5mm.nii.gz --warp=reg/example_func2stdWarp.nii.gz --out=example_func2std.nii.gz
+applywarp --in=example_func_brain.nii.gz --ref=std_2.5mm.nii.gz --warp=reg/example_func2stdWarp.nii.gz --out=example_func2std.nii.gz
 
 fslmaths filtered_func_data.nii.gz -mas example_funcbrainmask.nii.gz filtered_func_data_brain
 
