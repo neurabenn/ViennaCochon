@@ -180,6 +180,6 @@ applywarp --in=example_func_brain.nii.gz --ref=/well/margulies/users/mnk884/Piga
 
 fslmaths filtered_func_data.nii.gz -mas example_funcbrainmask.nii.gz filtered_func_data_brain
 
-applywarp --in=filtered_func_data_brain.nii.gz --ref=/well/margulies/users/mnk884/PigaDataViennaComplete/PNI50_2.5mm.nii.gz --warp=reg/example_func2stdWarp.nii.gz --out=filtered_func_data_2std_dirty.nii.gz
+applywarp --in=filtered_func_data_brain.nii.gz --ref=/well/margulies/users/mnk884/PigaDataViennaComplete/PNI50_2.5mm.nii.gz --warp=reg/example_func2stdWarp.nii.gz --out=filtered_func_data_2std_dirty.nii.gz --interp=spline
 
 
