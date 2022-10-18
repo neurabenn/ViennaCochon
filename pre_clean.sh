@@ -78,7 +78,7 @@ convert_xfm  -omat highres_2examplefunc.mat -inverse example_func2highres.mat
 
 applywarp  -i brain_mask.nii.gz -r example_func_data.nii.gz -o example_funcbrainmask.nii.gz --premat=highres_2examplefuncInit.mat
 
-fslmaths example_funcbrainmask.nii.gz -dilM -bin  example_funcbrainmask.nii.gz
+fslmaths example_funcbrainmask.nii.gz -bin  example_funcbrainmask.nii.gz
 fslmaths example_func_data.nii.gz -mas example_funcbrainmask.nii.gz example_func_brain.nii.gz
 
 ### final registration
