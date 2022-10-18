@@ -170,7 +170,7 @@ fslmaths ${func_data/.nii.gz/scaled} -Tmean tempMean
 
 fslmaths ${func_data/.nii.gz/scaled} -bptf 16.66666667 -1 -add tempMean filtered_func_data ##### bandpass filtered to 100 seconds. its FWHM so TR of 2, 50 seconds means 25 as half max.
 
-melodic -i filtered_func_data.nii.gz -o ./filtered_func_data.ica -m ${mask} --report --nobet --Oall
+melodic -i filtered_func_data.nii.gz -o ./filtered_func_data.ica -m example_funcbrainmask.nii.gz --report --nobet --Oall
 
 
 rm *pre_filtered_func*
