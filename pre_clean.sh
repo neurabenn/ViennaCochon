@@ -27,6 +27,8 @@ fslmaths ${func} ${out}/prefiltered_func_data.nii.gz
 fslmaths ${mask} ${out}/brain_mask.nii.gz
 fslmaths ${std} ${out}/std.nii.gz
 fslmaths ${std_mask} ${out}/ref_mask.nii.gz
+fslmaths ${subj}/handMask_func.nii.gz ${out}/handMask_func.nii.gz
+
 fslmaths /well/margulies/users/mnk884/PigaDataViennaComplete/PNI50_2.5mm.nii.gz  ${out}/std_2.5mm.nii.gz
 
 cd ${out}
@@ -59,31 +61,33 @@ fslroi prefiltered_func_data.nii.gz example_func_data.nii.gz ${mid} 1
 
 #### initial betting 
 
-bet example_func_data.nii.gz example_func_data_initBET.nii.gz -m  -f 0.9 -c 38 28 10 
+fslmaths example_func_data.nii.gz -mas handMask_func.nii.gz example_func_brain.nii.gz
+
+# bet example_func_data.nii.gz example_func_data_initBET.nii.gz -m  -f 0.9 -c 38 28 10 
 
 #### initialize func brain extraction with registration 
-flirt -in example_func_data_initBET.nii.gz -ref highres_brain.nii.gz -dof 7  -out example_func2highresInit  -omat example_func2highresInit.mat -usesqform
-convert_xfm  -omat highres_2examplefuncInit.mat -inverse example_func2highresInit.mat
+# flirt -in example_func_data_initBET.nii.gz -ref highres_brain.nii.gz -dof 7  -out example_func2highresInit  -omat example_func2highresInit.mat -usesqform
+# convert_xfm  -omat highres_2examplefuncInit.mat -inverse example_func2highresInit.mat
 
-applywarp  -i brain_mask.nii.gz -r example_func_data.nii.gz -o func_maskInit.nii.gz --premat=highres_2examplefuncInit.mat
+# applywarp  -i brain_mask.nii.gz -r example_func_data.nii.gz -o func_maskInit.nii.gz --premat=highres_2examplefuncInit.mat
 
-fslmaths func_maskInit.nii.gz -dilM -dilM -bin func_maskInit.nii.gz
+# fslmaths func_maskInit.nii.gz -dilM -dilM -bin func_maskInit.nii.gz
 
-fslmaths example_func_data.nii.gz -mas func_maskInit.nii.gz example_func_brain.nii.gz
+# fslmaths example_func_data.nii.gz -mas func_maskInit.nii.gz example_func_brain.nii.gz
 
 ##### second extraction 
 
-flirt -in example_func_brain.nii.gz -ref highres_brain.nii.gz -dof 7  -usesqform -out example_func2highres -omat example_func2highres.mat
+flirt -in example_func_brain.nii.gz -ref highres_brain.nii.gz -dof 7  -out example_func2highres -omat example_func2highres.mat
 convert_xfm  -omat highres_2examplefunc.mat -inverse example_func2highres.mat
 
-applywarp  -i brain_mask.nii.gz -r example_func_data.nii.gz -o example_funcbrainmask.nii.gz --premat=highres_2examplefuncInit.mat
+# applywarp  -i brain_mask.nii.gz -r example_func_data.nii.gz -o example_funcbrainmask.nii.gz --premat=highres_2examplefuncInit.mat
 
-fslmaths example_funcbrainmask.nii.gz -bin  example_funcbrainmask.nii.gz
+fslmaths handMask_func.nii.gz  example_funcbrainmask.nii.gz
 fslmaths example_func_data.nii.gz -mas example_funcbrainmask.nii.gz example_func_brain.nii.gz
 
 ### final registration
 ### init with 6dof 
-flirt -in example_func_brain.nii.gz -ref highres_brain.nii.gz -dof 7 -usesqform -out example_func2highres -omat example_func2highres.mat
+flirt -in example_func_brain.nii.gz -ref highres_brain.nii.gz -dof 7 -out example_func2highres -omat example_func2highres.mat
 
 
 
